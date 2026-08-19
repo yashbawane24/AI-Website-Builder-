@@ -1,0 +1,213 @@
+// ============================================
+// Prisma Schema — AI Website Builder (SQLite Version)
+// ============================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+// --- Models ---
+
+model User {
+  id              String    @id @default(cuid())
+  email           String    @unique
+  password        String
+  name            String
+  avatar          String?
+  role            String    @default("USER")
+  credits         Int       @default(20)
+  emailVerified   Boolean   @default(false)
+  verifyToken     String?
+  verifyExpiry    DateTime?
+  resetToken      String?
+  resetExpiry     DateTime?
+  refreshToken    String?
+  theme           String    @default("dark")
+  language        String    @default("en")
+  notifyEmail     Boolean   @default(true)
+  notifyBrowser   Boolean   @default(true)
+  stripeCustomerId String?  @unique
+
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  // Relations
+  projects        Project[]
+  payments        Payment[]
+  subscriptions   Subscription[]
+  creditTransactions CreditTransaction[]
+  activityLogs    ActivityLog[]
+  promptHistory   PromptHistory[]
+
+  @@map("users")
+}
+
+model Project {
+  id          String        @id @default(cuid())
+  userId      String
+  name        String
+  description String?
+  prompt      String
+  htmlCode    String?
+  cssCode     String?
+  jsCode      String?
+  reactCode   String?
+  thumbnail   String?
+  status      String        @default("DRAFT")
+  isFavorite  Boolean       @default(false)
+  isArchived  Boolean       @default(false)
+  templateId  String?
+
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  // Relations
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  template    Template?     @relation(fields: [templateId], references: [id])
+  versions    VersionHistory[]
+  prompts     PromptHistory[]
+
+  @@index([userId])
+  @@index([status])
+  @@map("projects")
+}
+
+model Template {
+  id          String    @id @default(cuid())
+  name        String
+  category    String
+  description String
+  prompt      String
+  thumbnail   String?
+  htmlCode    String?
+  cssCode     String?
+  jsCode      String?
+  reactCode   String?
+  isActive    Boolean   @default(true)
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // Relations
+  projects    Project[]
+
+  @@map("templates")
+}
+
+model Payment {
+  id              String        @id @default(cuid())
+  userId          String
+  stripePaymentId String?       @unique
+  stripeSessionId String?       @unique
+  amount          Float
+  currency        String        @default("usd")
+  credits         Int           @default(0)
+  status          String        @default("PENDING")
+  type            String
+  description     String?
+
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  // Relations
+  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("payments")
+}
+
+model Subscription {
+  id                  String             @id @default(cuid())
+  userId              String
+  stripeSubscriptionId String?           @unique
+  plan                String             @default("FREE")
+  status              String             @default("ACTIVE")
+  currentPeriodStart  DateTime?
+  currentPeriodEnd    DateTime?
+  cancelAtPeriodEnd   Boolean            @default(false)
+
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
+
+  // Relations
+  user                User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("subscriptions")
+}
+
+model CreditTransaction {
+  id          String     @id @default(cuid())
+  userId      String
+  amount      Int
+  type        String
+  description String?
+  projectId   String?
+  balanceAfter Int
+
+  createdAt   DateTime   @default(now())
+
+  // Relations
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("credit_transactions")
+}
+
+model ActivityLog {
+  id        String   @id @default(cuid())
+  userId    String
+  action    String
+  metadata  Json?
+  ipAddress String?
+  userAgent String?
+
+  createdAt DateTime @default(now())
+
+  // Relations
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([createdAt])
+  @@map("activity_logs")
+}
+
+model PromptHistory {
+  id        String   @id @default(cuid())
+  userId    String
+  projectId String?
+  prompt    String
+  response  String?
+
+  createdAt DateTime @default(now())
+
+  // Relations
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  project   Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@map("prompt_history")
+}
+
+model VersionHistory {
+  id        String   @id @default(cuid())
+  projectId String
+  version   Int
+  htmlCode  String?
+  cssCode   String?
+  jsCode    String?
+  reactCode String?
+  label     String?
+
+  createdAt DateTime @default(now())
+
+  // Relations
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@map("version_history")
+}
