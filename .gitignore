@@ -1,0 +1,29 @@
+# Dependencies
+node_modules
+.pnpm-store
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+prisma/dev.db
+backend/prisma/dev.db
+
+# Builds & Outputs
+dist
+build
+.output
+.vite
+uploads/*
+!uploads/.gitkeep
+
+# IDE & OS
+.DS_Store
+.idea
+.vscode
+*.log

@@ -1,0 +1,32 @@
+{
+  "name": "ai-website-builder-frontend",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@hookform/resolvers": "^5.5.7",
+    "@monaco-editor/react": "^4.7.0",
+    "axios": "^1.19.0",
+    "framer-motion": "^12.43.0",
+    "lucide-react": "^1.28.0",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "react-hook-form": "^7.83.0",
+    "react-hot-toast": "^2.6.0",
+    "react-router-dom": "^7.18.2",
+    "recharts": "^3.10.1",
+    "zod": "^3.25.76",
+    "zustand": "^5.0.14"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.3.3",
+    "@vitejs/plugin-react": "^6.0.5",
+    "tailwindcss": "^4.3.3",
+    "vite": "^8.2.0"
+  }
+}
